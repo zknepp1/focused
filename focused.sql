@@ -1,38 +1,38 @@
 CREATE TABLE `Photographers` (
   `PhotographerID` integer PRIMARY KEY,
   `JobID` integer,
-  `photographerfname` varchar(255),
-  `photographerlname` varchar(255),
+  `photographerfname` varchar(255) NOT NULL,
+  `photographerlname` varchar(255) NOT NULL,
   `photographerContactNumber` varchar(255),
   `photographerEmail` varchar(255)
 );
 
 CREATE TABLE `Customers` (
   `CustomerID` integer PRIMARY KEY,
-  `customerfname` varchar(255),
-  `customerlname` varchar(255),
-  `customerContactNumber` varchar(255),
-  `customerEmail` varchar(255),
-  `customerAddress` varchar(255)
+  `customerfname` varchar(255) NOT NULL,
+  `customerlname` varchar(255) NOT NULL,
+  `customerContactNumber` varchar(255) NOT NULL,
+  `customerEmail` varchar(255) NOT NULL,
+  `customerAddress` varchar(255) NOT NULL
 );
 
 CREATE TABLE `Jobs` (
   `JobID` integer PRIMARY KEY,
-  `SchoolName` varchar(255),
-  `pictureDate` timestamp,
-  `schoolLocation` varchar(255),
-  `schoolContactNumber` varchar(255),
-  `schoolEmail` varchar(255),
-  `schoolAddress` varchar(255)
+  `SchoolName` varchar(255) NOT NULL,
+  `pictureDate` timestamp NOT NULL,
+  `schoolLocation` varchar(255) NOT NULL,
+  `schoolContactNumber` varchar(255) NOT NULL,
+  `schoolEmail` varchar(255) NOT NULL,
+  `schoolAddress` varchar(255) NOT NULL
 );
 
 CREATE TABLE `Students` (
   `StudentID` integer PRIMARY KEY,
-  `fname` varchar(255),
-  `lname` varchar(255),
-  `teacher` varchar(255),
-  `GradeOrClass` varchar(255),
-  `barcodeID` integer,
+  `fname` varchar(255) NOT NULL,
+  `lname` varchar(255) NOT NULL,
+  `teacher` varchar(255) NOT NULL,
+  `GradeOrClass` varchar(255) NOT NULL,
+  `barcodeID` integer NOT NULL,
   `JobID` integer
 );
 
@@ -50,7 +50,6 @@ CREATE TABLE `Orders` (
   `CustomerID` integer,
   `JobID` integer,
   `PriceSheetID` integer,
-  `CartID` integer,
   `items` integer,
   `DatePlaced` timestamp,
   `TotalAmount` integer,
