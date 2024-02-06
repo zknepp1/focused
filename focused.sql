@@ -65,9 +65,15 @@ CREATE TABLE `Orders` (
   FOREIGN KEY (`PriceSheetID`) REFERENCES `PriceSheets` (`PriceSheetID`)
 );
 
+
+Certainly! To improve the Barcode table in your database design, we should first clarify its purpose and structure based on your description that it is an identifier for the student that contains the student's pictures. Here's a revised version of your Barcode table:
+
+sql
+Copy code
 CREATE TABLE `Barcode` (
   `barcodeID` INTEGER PRIMARY KEY,
-  `StudentID` INTEGER,
-  `pictures` INTEGER,
+  `StudentID` INTEGER NOT NULL,
+  `pictureCount` INTEGER DEFAULT 0,
+  `picturePath` VARCHAR(255),
   FOREIGN KEY (`StudentID`) REFERENCES `Students` (`StudentID`)
 );
