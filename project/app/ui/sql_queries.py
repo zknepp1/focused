@@ -165,6 +165,9 @@ select_students_parents = """SELECT c.customerfname, c.customerlname, s.fname, s
                                 JOIN ParentStudent ps ON c.CustomerID = ps.CustomerID
                                 JOIN Students s ON ps.StudentID = s.StudentID;"""
 
+select_orders = """SELECT OrderID, CustomerID, JobID, PriceSheetID, items, DatePlaced, TotalAmount, Status 
+                                FROM Orders;"""
+
 select_orders_by_customer = """SELECT OrderID, JobID, PriceSheetID, items, DatePlaced, TotalAmount, Status 
                                 FROM Orders 
                                 WHERE CustomerID = 'Specific Customer ID';"""
@@ -182,4 +185,6 @@ select_orders_revenue = """SELECT COUNT(OrderID) AS TotalOrders, SUM(TotalAmount
 select_all_jobs_school = """SELECT JobID, SchoolName, pictureDate, schoolLocation 
                             FROM Jobs 
                             WHERE SchoolName = 'Specific School Name';"""
+
+
 
