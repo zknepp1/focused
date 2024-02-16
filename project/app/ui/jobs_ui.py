@@ -90,6 +90,63 @@ class JobsPage(tk.Frame):
         import_job_button = tk.Button(button_frame, text="Import Jobs From File", command=self.open_import_jobs_dialog, **button_style)
         import_job_button.grid(row=0, column=4, padx=10, pady=10)
 
+        # Add a delete button
+        delete_button = tk.Button(button_frame, text="Delete Job", command=self.delete_selected_job, **button_style)
+        delete_button.grid(row=0, column=5, padx=10, pady=10)
+
+
+    def delete_selected_job(self):
+        selected_job_id = self.get_selected_job_id()
+        if selected_job_id is not None:
+            if self.delete_job_from_database(selected_job_id):  # Check if deletion was successful
+                messagebox.showinfo("Success", f"Job {selected_job_id} has been deleted.")
+                self.update_jobs_list()
+            else:
+                messagebox.showerror("Error", "Failed to delete the job.")
+        else:
+            messagebox.showwarning("Selection Error", "Please select a job to delete.")
+
+
+    def get_selected_job_id(self):
+        # Get the item that is currently selected in the treeview
+        selection = self.treeview.selection()
+        
+        if selection:  # If there is a selection
+            # Get the first (and ideally, only) item in the selection
+            item = selection[0]
+            # Retrieve the job ID from the values of the selected item
+            selected_job_id = self.treeview.item(item, 'values')[0]
+            return selected_job_id
+        else:  # If nothing is selected
+            messagebox.showwarning("Selection Error", "No job selected.")
+            return None
+
+
+    def delete_job_from_database(self, selected_job_id):
+        try:
+            conn = sqlite3.connect('example.db')
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM Jobs WHERE JobID = ?;", (selected_job_id,))
+            conn.commit()  # Commit the transaction
+        except sqlite3.Error as e:
+            tk.messagebox.showerror("Database Error", str(e))
+            return False  # Return False on error
+        finally:
+            conn.close()
+        return True
+
+
+    def update_jobs_list(self):
+        # Clear the current content of the treeview
+        for item in self.treeview.get_children():
+            self.treeview.delete(item)
+        
+        # Fetch the updated list of jobs from the database
+        new_data = self.get_data()
+        
+        # Re-populate the treeview with the new data
+        for job in new_data:
+            self.treeview.insert('', 'end', values=job)
 
 
     def on_job_select(self, event):
@@ -305,11 +362,5 @@ class AddJobDialog(tk.Toplevel):
 
         self.master.add_job_to_database(school_name, picture_date, school_location, school_contact_number, school_email, school_address)
         self.destroy()
-
-
-
-
-
-
 
 
