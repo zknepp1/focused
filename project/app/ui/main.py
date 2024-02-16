@@ -6,11 +6,12 @@ from pricesheets_ui import PricesheetsPage
 from orders import OrdersPage
 from account_info import AccountInfoPage
 
+
 class SampleApp(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         self.title("My Application")  # Set the window title
-        self.geometry("800x600")  # Set the size of the main application window
+        self.geometry("1200x1000")  # Set the size of the main application window
 
         # Create a menu bar
         menu_bar = tk.Menu(self)
@@ -51,7 +52,5 @@ class SampleApp(tk.Tk):
 
 app = SampleApp()
 app.mainloop()
-
-
 
 

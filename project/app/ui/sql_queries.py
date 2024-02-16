@@ -182,9 +182,9 @@ select_barcodes_students = """SELECT b.barcodeID, s.fname, s.lname, b.pictureCou
 select_orders_revenue = """SELECT COUNT(OrderID) AS TotalOrders, SUM(TotalAmount) AS TotalRevenue 
                             FROM Orders;"""
 
-select_all_jobs_school = """SELECT JobID, SchoolName, pictureDate, schoolLocation 
-                            FROM Jobs 
-                            WHERE SchoolName = 'Specific School Name';"""
+select_all_jobs_school = """SELECT SchoolName, schoolLocation, schoolContactNumber, schoolAddress, COUNT(*) AS Frequency
+                              FROM Jobs
+                              WHERE SchoolName = ?;"""
 
 
 
