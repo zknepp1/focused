@@ -187,4 +187,7 @@ select_all_jobs_school = """SELECT SchoolName, schoolLocation, schoolContactNumb
                               WHERE SchoolName = ?;"""
 
 
-
+select_students_from_job_id = """SELECT Students.StudentID, Students.fname, Students.lname, Students.teacher, Students.GradeOrClass, Students.JobID
+                                 FROM Students
+                                 JOIN Jobs ON Students.JobID = Jobs.JobID
+                                 WHERE Jobs.JobID = ?; """

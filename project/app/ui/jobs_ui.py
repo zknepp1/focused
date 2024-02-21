@@ -1,11 +1,15 @@
 import tkinter as tk
 from tkinter import ttk
 import sqlite3
+
 from sql_queries import select_jobs, select_all_jobs_school
+from job_select_information import JobDetailWindow
+
 from tkinter import messagebox
 import tkinter.font as tkFont
 from tkinter import filedialog
 import pandas as pd
+
 
 class JobsPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -154,18 +158,9 @@ class JobsPage(tk.Frame):
         if selected_item:
             job_id = self.treeview.item(selected_item)['values'][0]
             school_name = self.treeview.item(selected_item)['values'][1]
-            #print(self.treeview.item(selected_item)['values'])
-            # Create a new Toplevel window
-            detail_window = tk.Toplevel(self)
-            detail_window.title("Job Details")
-            
-            # Fetch the job's data from the database
-            job_data = self.get_job_data(school_name)
+            JobDetailWindow(self, job_id, school_name)
 
-            # Display the job's data in labels or any other widgets
-            for i, (key, value) in enumerate(job_data.items()):
-                label = tk.Label(detail_window, text=f"{key}: {value}")
-                label.grid(row=i, column=0, sticky="w")
+
 
 
     def get_job_data(self, school_name):
