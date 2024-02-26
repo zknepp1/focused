@@ -5,11 +5,19 @@ from jobs_ui import JobsPage
 from pricesheets_ui import PricesheetsPage
 from orders import OrdersPage
 from account_info import AccountInfoPage
+import sqlite3
+
+from sql_queries import create_database
+
 
 
 class SampleApp(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
+
+        # CREATES THE DATABASE
+        #self.create_database()
+
         self.title("My Application")  # Set the window title
         self.geometry("1200x1000")  # Set the size of the main application window
 
@@ -49,6 +57,32 @@ class SampleApp(tk.Tk):
         self.frames["AccountInfoPage"].job_id = job_id  # Update job_id each time
         self.frames["AccountInfoPage"].update_info()  # Assuming you have this method to update info based on job_id
         self.show_frame("AccountInfoPage")
+
+
+    def create_database(self):
+        conn = None
+        try:
+            conn = sqlite3.connect('example.db')
+            cursor = conn.cursor()
+
+            for command in create_database:
+                try:
+                    cursor.execute(command)
+                except sqlite3.Error as e:
+                    # Show error for the specific command
+                    tk.messagebox.showerror("Database Command Error", f"Error in SQL command: {command}\nError message: {str(e)}")
+                    continue  # Skip to the next command
+
+            conn.commit()  # Commit the transaction after all commands are attempted
+        except sqlite3.Error as e:
+            tk.messagebox.showerror("Database Connection Error", str(e))
+            return False  # Return False on database connection error
+        finally:
+            if conn:
+                conn.close()
+        return True
+
+
 
 app = SampleApp()
 app.mainloop()

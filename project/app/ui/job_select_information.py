@@ -1,6 +1,8 @@
 import tkinter as tk
+from tkinter import ttk
 import sqlite3
 from tkinter import messagebox
+import pandas as pd
 
 from sql_queries import select_students_from_job_id
 
@@ -51,6 +53,40 @@ class JobDetailWindow(tk.Toplevel):
         # Button to add student
         tk.Button(self, text="Add Student", command=self.add_student).pack()
 
+        # Initialize the tree view
+        self.setup_tree_view()
+
+
+
+    def setup_tree_view(self):
+        # Define columns
+        columns = ('student_id', 'first_name', 'last_name', 'teacher', 'grade_class')
+
+        self.tree = ttk.Treeview(self, columns=columns, show='headings')
+        self.tree.heading('student_id', text='Student ID')
+        self.tree.heading('first_name', text='First Name')
+        self.tree.heading('last_name', text='Last Name')
+        self.tree.heading('teacher', text='Teacher')
+        self.tree.heading('grade_class', text='Grade/Class')
+
+        # Arrange the tree view
+        self.tree.pack(expand=True, fill='both')
+
+        # Populate the tree view with data
+        self.populate_tree_view()
+
+
+    def populate_tree_view(self):
+        # Clear existing data in the tree
+        for i in self.tree.get_children():
+            self.tree.delete(i)
+
+        # Fetch data from database
+        students = self.get_student_data_by_job(self.job_id)
+
+        # Insert data into tree view
+        for student in students:
+            self.tree.insert('', 'end', values=student)
 
 
     def get_student_data_by_job(self, job_id):
@@ -58,15 +94,17 @@ class JobDetailWindow(tk.Toplevel):
             conn = sqlite3.connect('example.db')
             cursor = conn.cursor()
             cursor.execute(select_students_from_job_id, (job_id,))
-            data = cursor.fetchone()
-            # Convert the data to a dictionary or any other format that's easy to display
-            #data_dict = {"School Name": data[0], "School Location": data[1], "School Contact Number": data[2], "School Address": data[3], "Number of Jobs": data[4]} # and so on for other fields
+            data = cursor.fetchall()  # Retrieve all rows of data
             return data
         except sqlite3.Error as e:
             tk.messagebox.showerror("Database Error", str(e))
-            return {}
+            return []
         finally:
             conn.close()
+
+
+
+
 
 
     def add_student(self):
@@ -83,34 +121,24 @@ class JobDetailWindow(tk.Toplevel):
 
 
         
-    def add_student_to_job(database_path, student_details, job_id):
+    def add_student_to_job(self, database_path, student_details, job_id):
         try:
-            # Connect to the SQLite database
-            conn = sqlite3.connect('example.db')
+            conn = sqlite3.connect(database_path)
             cursor = conn.cursor()
-
-            # SQL query to insert a new student
-            insert_query = ''' INSERT INTO Students(fname, lname, teacher, GradeOrClass, JobID)
-                            VALUES(?,?,?,?,?) '''
-            student_data = (student_details['fname'], student_details['lname'], student_details['teacher'], student_details['GradeOrClass'], job_id)
-
-            # Execute the query and commit the changes
+            insert_query = '''INSERT INTO Students(fname, lname, teacher, GradeOrClass, JobID)
+                              VALUES(?,?,?,?,?)'''
+            student_data = (student_details['fname'], student_details['lname'], 
+                            student_details['teacher'], student_details['GradeOrClass'], job_id)
             cursor.execute(insert_query, student_data)
             conn.commit()
             print("Student added successfully.")
-
         except sqlite3.Error as e:
             tk.messagebox.showerror("Database Error", str(e))
-            return {}
         finally:
             conn.close()
 
-"""CREATE TABLE `Students` (
-   `StudentID` INTEGER PRIMARY KEY,
-   `fname` VARCHAR(255),
-   `lname` VARCHAR(255),
-   `teacher` VARCHAR(255),
-   `GradeOrClass` VARCHAR(255),
-   `JobID` INTEGER,
-   FOREIGN KEY (`JobID`) REFERENCES `Jobs` (`JobID`)
-   );"""
+
+
+
+
+

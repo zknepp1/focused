@@ -1,8 +1,12 @@
 import tkinter as tk
 import tkinter.font as tkFont
+import sqlite3
+
+from sql_queries import delete_database, create_database
 
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
+
         tk.Frame.__init__(self, parent)
         self.configure(bg="#E1BEE7")  # Light purple background
 
@@ -11,7 +15,7 @@ class StartPage(tk.Frame):
         
         # Welcome label
         label = tk.Label(self, text="Welcome to the Application", font=welcome_font, bg="#E1BEE7", fg="#6A1B9A")
-        label.grid(row=0, column=0, columnspan=2, pady=20, padx=10)
+        label.grid(row=0, column=0, columnspan=2, pady=10, padx=10)
 
         # Button style
         button_style = {"bg": "#9C27B0", "fg": "white", "font": button_font, "activebackground": "#6A1B9A", "activeforeground": "white"}
@@ -31,5 +35,20 @@ class StartPage(tk.Frame):
         for i in range(4):
             self.grid_rowconfigure(i, weight=1)
 
+
+
+    def delete_database(self):
+        try:
+            conn = sqlite3.connect('example.db')
+            cursor = conn.cursor()
+            for i in delete_database:
+                cursor.execute(i)
+                conn.commit()  # Commit the transaction
+        except sqlite3.Error as e:
+            tk.messagebox.showerror("Database Error", str(e))
+            return False  # Return False on error
+        finally:
+            conn.close()
+        return True
 
             

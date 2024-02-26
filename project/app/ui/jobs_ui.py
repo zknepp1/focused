@@ -98,6 +98,9 @@ class JobsPage(tk.Frame):
         delete_button = tk.Button(button_frame, text="Delete Job", command=self.delete_selected_job, **button_style)
         delete_button.grid(row=0, column=5, padx=10, pady=10)
 
+        import_students_button = tk.Button(button_frame, text="Import Students From File", command=self.open_import_students_dialog, **button_style)
+        import_students_button.grid(row=0, column=6, padx=10, pady=10)
+
 
     def delete_selected_job(self):
         selected_job_id = self.get_selected_job_id()
@@ -205,11 +208,13 @@ class JobsPage(tk.Frame):
             job_id = self.treeview.item(selected_item)['values'][0]
             EditJobDialog(self, job_id)
 
+
     def refresh_data(self):
         self.treeview.delete(*self.treeview.get_children())
         data = self.get_data()
         for job in data:
             self.treeview.insert('', tk.END, values=job)
+
 
     def add_job_to_database(self, school_name, picture_date, school_location, school_contact_number, school_email, school_address):
         try:
@@ -225,10 +230,12 @@ class JobsPage(tk.Frame):
         finally:
             conn.close()
 
+
     def open_import_jobs_dialog(self):
         filename = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv"), ("Excel files", "*.xlsx")])
         if filename:
             self.import_jobs_from_file(filename)
+
 
 
     def import_jobs_from_file(self, filename):
@@ -244,10 +251,14 @@ class JobsPage(tk.Frame):
 
         # Iterate over DataFrame and insert data
         for _, row in df.iterrows():
-            picture_date_str = row['PictureDate'].strftime('%Y-%m-%d %H:%M:%S') if pd.notnull(row['PictureDate']) else None
+            #picture_date_str = row['PictureDate'].strftime('%Y-%m-%d %H:%M:%S') if pd.notnull(row['PictureDate']) else None
             self.row_count = self.row_count + 1
-            cursor.execute("INSERT INTO jobs (JobID, SchoolName, PictureDate, SchoolLocation, SchoolContactNumber, SchoolEmail, SchoolAddress) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                           (self.row_count, row['SchoolName'], picture_date_str, row['SchoolLocation'], row['SchoolContactNumber'], row['SchoolEmail'], row['SchoolAddress']))
+            row['jobDate'] = row['jobDate'].strftime('%Y-%m-%d %H:%M:%S') if pd.notnull(row['jobDate']) else None
+            row['createDate'] = row['createDate'].strftime('%Y-%m-%d %H:%M:%S') if pd.notnull(row['createDate']) else None
+            row['lastModified'] = row['lastModified'].strftime('%Y-%m-%d %H:%M:%S') if pd.notnull(row['lastModified']) else None
+
+            cursor.execute("INSERT INTO jobs (JobID, Title, Sync, numImages, jobType, marketingCampaign, priceSheet, keyword, jobDate, createDate, lastModified, jobLocation, jobContactNumber, jobEmail, jobAddress) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                           (row['JobID'], row['Title'], row['Sync'], row['numImages'], row['jobType'], row['marketingCampaign'], row['priceSheet'], row['keyword'], row['jobDate'], row['createDate'], row['lastModified'], row['jobLocation'], row['jobContactNumber'], row['jobEmail'], row['jobAddress']))
         
         conn.commit()
         conn.close()
@@ -256,10 +267,42 @@ class JobsPage(tk.Frame):
         self.refresh_data()
 
 
+
+    def open_import_students_dialog(self):
+        filename = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv"), ("Excel files", "*.xlsx")])
+        if filename:
+            self.import_students_from_file(filename)
+
+
+    def import_students_from_file(self, filename):
+        # Read the file using pandas
+        if filename.endswith('.csv'):
+            df = pd.read_csv(filename)
+        else:
+            df = pd.read_excel(filename)
+
+        # Connect to the SQLite database
+        conn = sqlite3.connect('example.db')
+        cursor = conn.cursor()
+
+        # Iterate over DataFrame and insert data
+        for _, row in df.iterrows():
+            cursor.execute("INSERT INTO Students (fname, lname, teacher, GradeOrClass, JobID) VALUES (?, ?, ?, ?, ?)",
+                        (row['FirstName'], row['LastName'], row['Teacher'], row['GradeOrClass'], row['JobID']))
+        
+        conn.commit()
+        conn.close()
+
+
+
+
+
+
     def open_add_job_dialog(self):
         AddJobDialog(self)
 
-
+############################################################################################################################
+############################################################################################################################
 
 class EditJobDialog(tk.Toplevel):
     def __init__(self, parent, job_id):
