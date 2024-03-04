@@ -8,17 +8,17 @@ class StartPage(tk.Frame):
     def __init__(self, parent, controller):
 
         tk.Frame.__init__(self, parent)
-        self.configure(bg="#E1BEE7")  # Light purple background
+        self.configure(bg="#D3D3D3")  # Light purple background
 
         welcome_font = tkFont.Font(family="Helvetica", size=16, weight="bold")
         button_font = tkFont.Font(family="Helvetica", size=12)
         
         # Welcome label
-        label = tk.Label(self, text="Welcome to the Application", font=welcome_font, bg="#E1BEE7", fg="#6A1B9A")
+        label = tk.Label(self, text="Welcome to the Application", font=welcome_font, bg="#6699CC", fg="#D3D3D3")
         label.grid(row=0, column=0, columnspan=2, pady=10, padx=10)
 
         # Button style
-        button_style = {"bg": "#9C27B0", "fg": "white", "font": button_font, "activebackground": "#6A1B9A", "activeforeground": "white"}
+        button_style = {"bg": "#6699CC", "fg": "white", "font": button_font, "activebackground": "#6A1B9A", "activeforeground": "white"}
 
         # Buttons
         button1 = tk.Button(self, text="Jobs", command=lambda: controller.show_frame("JobsPage"), **button_style)

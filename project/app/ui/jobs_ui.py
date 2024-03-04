@@ -13,20 +13,20 @@ import pandas as pd
 
 class JobsPage(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent, bg="#E1BEE7")
+        tk.Frame.__init__(self, parent, bg="#D3D3D3")
         self.controller = controller
         
         # Use bold font for the page title
         title_font = tkFont.Font(family="Helvetica", size=16, weight="bold")
-        label = tk.Label(self, text="Jobs Page", font=title_font, bg="#E1BEE7", fg="#6A1B9A")
+        label = tk.Label(self, text="Jobs Page", font=title_font, bg="#D3D3D3", fg="#6A1B9A")
         label.grid(row=0, column=0, columnspan=2, pady=10)
 
         # Organize the layout into frames
-        top_frame = tk.Frame(self, bg="#E1BEE7")
+        top_frame = tk.Frame(self, bg="#D3D3D3")
         top_frame.grid(row=1, column=0, sticky="ew")
-        table_frame = tk.Frame(self, bg="#E1BEE7")
+        table_frame = tk.Frame(self, bg="#D3D3D3")
         table_frame.grid(row=2, column=0, sticky="nsew")
-        button_frame = tk.Frame(self, bg="#E1BEE7")
+        button_frame = tk.Frame(self, bg="#D3D3D3")
         button_frame.grid(row=3, column=0, sticky="ew")
 
         # Configuring row and column weights for responsiveness
@@ -34,7 +34,7 @@ class JobsPage(tk.Frame):
         self.grid_columnconfigure(0, weight=1)
 
         # Search bar in top frame using grid
-        search_label = tk.Label(top_frame, text="Search:", bg="#E1BEE7", fg="#6A1B9A")
+        search_label = tk.Label(top_frame, text="Search:", bg="#D3D3D3", fg="#6A1B9A")
         search_label.grid(row=0, column=0, padx=5, pady=(0, 5))
         self.search_entry = tk.Entry(top_frame)
         self.search_entry.grid(row=0, column=1, sticky="ew", padx=5, pady=(0, 5))
@@ -50,8 +50,10 @@ class JobsPage(tk.Frame):
 
         # Customizing the treeview
         style = ttk.Style(self)
-        style.configure("Treeview", background="#E1BEE7", fieldbackground="#E1BEE7", foreground="#6A1B9A")
-        style.configure("Treeview.Heading", background="#9C27B0", foreground="white")
+        style.configure("Treeview", background="#D3D3D3", fieldbackground="#D3D3D3", foreground="#6A1B9A")
+
+        # Configure Treeview Heading style for blue text
+        style.configure("Treeview.Heading", background="#D3D3D3", foreground="blue", font=('Helvetica', 10, 'bold'))
 
         # Create a treeview widget
         treeview = ttk.Treeview(self, columns=("JobID", "SchoolName", "pictureDate", "schoolLocation", "schoolContactNumber", "schoolEmail", "schoolAddress"), show="headings")
@@ -65,9 +67,15 @@ class JobsPage(tk.Frame):
         treeview.heading("schoolEmail", text="Email")
         treeview.heading("schoolAddress", text="Address")
 
+
+
+        # Define a tag with a specific text color
+        treeview.tag_configure('blueText', foreground='blue')
+
+
         # Populate the treeview with sample data
         for job in data:
-            treeview.insert('', tk.END, values=job)
+            treeview.insert('', tk.END, values=job, tags=('blueText',))
 
         # In the __init__ method, bind the double-click event
         treeview.bind("<Double-1>", self.on_job_select)
@@ -216,21 +224,6 @@ class JobsPage(tk.Frame):
             self.treeview.insert('', tk.END, values=job)
 
 
-    def add_job_to_database(self, school_name, picture_date, school_location, school_contact_number, school_email, school_address):
-        try:
-            conn = sqlite3.connect('example.db')
-            cursor = conn.cursor()
-            #adding 1 to the row count
-            self.row_count = self.row_count + 1
-            cursor.execute("INSERT INTO jobs (JobID, SchoolName, PictureDate, SchoolLocation, SchoolContactNumber, SchoolEmail, SchoolAddress) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                        (self.row_count, school_name, picture_date, school_location, school_contact_number, school_email, school_address))
-            conn.commit()
-        except sqlite3.Error as e:
-            tk.messagebox.showerror("Database Error", str(e))
-        finally:
-            conn.close()
-
-
     def open_import_jobs_dialog(self):
         filename = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv"), ("Excel files", "*.xlsx")])
         if filename:
@@ -287,19 +280,21 @@ class JobsPage(tk.Frame):
 
         # Iterate over DataFrame and insert data
         for _, row in df.iterrows():
-            cursor.execute("INSERT INTO Students (fname, lname, teacher, GradeOrClass, JobID) VALUES (?, ?, ?, ?, ?)",
-                        (row['FirstName'], row['LastName'], row['Teacher'], row['GradeOrClass'], row['JobID']))
+            cursor.execute("INSERT INTO Students (fname, lname, teacher, GradeOrClass, barcodeID, JobID) VALUES (?, ?, ?, ?, ?, ?)",
+                        (row['fname'], row['lname'], row['teacher'], row['GradeOrClass'], row['barcodeID'], row['JobID']))
         
         conn.commit()
         conn.close()
 
 
-
-
-
-
     def open_add_job_dialog(self):
         AddJobDialog(self)
+
+
+
+
+
+
 
 ############################################################################################################################
 ############################################################################################################################
